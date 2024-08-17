@@ -6,55 +6,116 @@
     <title>学习学习再学习</title>
     <link rel="icon" href="余幼时即厌学.jpg" type="image/jpeg">
     <style>
-       body {
+        body {
             font-family: 'Microsoft YaHei', sans-serif;
             background-color: #f4f4f4;
             margin: 0;
             padding: 0;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
-            height: 100vh;
+            align-items: center;
+            height: 200vh;
         }
         .container {
             background-color: #fff;
-            padding: 50px;
+            padding: 30px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            width: 80%;
+            width: 90%;
             max-width: 800px;
+            position: relative;
         }
         h1 {
             color: rgba(0, 128, 0, 0.5);
-        }
-        h3 {
-            color: #blue;
-            margin: 10px 0;
+            margin-bottom: 20px;
         }
         a {
             text-decoration: none;
             color: #007BFF;
+            display: block;
+            margin: 5px 0;
         }
         a:hover {
             text-decoration: underline;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .login-form {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .login-form input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .login-form button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .login-form button:hover {
+            background-color: #0056b3;
+        }
+        .user-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #333;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="user-info" id="userInfo"></div>
         <h1>我不爱学习</h1>
-        <a href="https://www.luogu.com.cn/"><h3>洛谷启动</h3></a>
-        <a href="https://www.tboj.cn/"><h3>ZYZOJ</h3></a>
-        <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript"><h3>JavaScript</h3></a>
-        <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS"><h3>CSS</h3></a>
-        <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML"><h3>HTML</h3></a>
-        <a href="https://chat.deepseek.com/"><h3>Deepseek</h3></a>
+        <a href="https://www.luogu.com.cn/">洛谷启动</a>
+        <a href="https://www.tboj.cn/">ZYZOJ</a>
+        <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript">JavaScript</a>
+        <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS">CSS</a>
+        <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML">HTML</a>
+        <a href="https://chat.deepseek.com/">Deepseek</a>
         <h1>余幼时即厌学</h1>
-        <img src="余幼时即厌学.jpg" alt="余幼时即厌学" width="800" height="600">
+        <img src="余幼时即厌学.jpg" alt="余幼时即厌学">
         <h1>邢而上学</h1>
         <h1>不邢而退学</h1>
+        
+        <div class="login-form">
+            <h2>登录</h2>
+            <input type="text" id="username" placeholder="用户名">
+            <input type="password" id="password" placeholder="密码">
+            <button onclick="login()">登录</button>
+        </div>
     </div>
-    <script src="script.js"></script>
+    <script>
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const userInfo = document.getElementById('userInfo');
+            userInfo.innerHTML = `<span style="font-weight: bold; color: purple;">欢迎, ${username}</span>`;
+            document.querySelector('.login-form').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
