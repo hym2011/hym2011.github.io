@@ -28,7 +28,7 @@
             position: relative;
             display: none;
         }
-        .login-form {
+        .login-form, .register-form {
             margin: auto;
             padding: 20px;
             border: 1px solid #ccc;
@@ -40,14 +40,14 @@
             left: 50%;
             transform: translate(-50%, -50%);
         }
-        .login-form input {
+        .login-form input, .register-form input {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        .login-form button {
+        .login-form button, .register-form button {
             width: 100%;
             padding: 10px;
             background-color: #007BFF;
@@ -56,7 +56,7 @@
             border-radius: 4px;
             cursor: pointer;
         }
-        .login-form button:hover {
+        .login-form button:hover, .register-form button:hover {
             background-color: #0056b3;
         }
         .user-info {
@@ -83,6 +83,18 @@
             height: auto;
             border-radius: 8px;
             margin-top: 20px;
+            cursor: pointer;
+        }
+        .rotating {
+            animation: rotate 1s linear;
+        }
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
         }
         @media (max-width: 600px) {
             .container {
@@ -105,26 +117,66 @@
         <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML">HTML</a>
         <a href="https://chat.deepseek.com/">Deepseek</a>
         <h1>余幼时即厌学</h1>
-        <img src="余幼时即厌学.jpg" alt="余幼时即厌学">
+        <img src="余幼时即厌学.jpg" alt="余幼时即厌学" id="image1" onclick="animateImage()">
         <h1>邢而上学</h1>
         <h1>不邢而退学</h1>
     </div>
     <div class="login-form" id="loginForm">
         <h2>登录</h2>
-        <input type="text" id="username" placeholder="用户名">
-        <input type="password" id="password" placeholder="密码">
+        <input type="text" id="loginUsername" placeholder="用户名">
+        <input type="password" id="loginPassword" placeholder="密码">
         <button onclick="login()">登录</button>
+        <button onclick="showRegisterForm()">注册</button>
+    </div>
+    <div class="register-form" id="registerForm" style="display: none;">
+        <h2>注册</h2>
+        <input type="text" id="registerUsername" placeholder="用户名">
+        <input type="password" id="registerPassword" placeholder="密码">
+        <button onclick="register()">注册</button>
+        <button onclick="showLoginForm()">返回登录</button>
     </div>
     <script>
-        function login() {
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const userInfo = document.getElementById('userInfo');
-            userInfo.innerHTML = `<span style="font-weight: bold; color: purple;">欢迎, ${username}</span>`;
+        function showRegisterForm() {
             document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-            document.body.style.height = 'auto';
-            document.body.style.overflow = 'auto';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+
+        function showLoginForm() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+
+        function register() {
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            localStorage.setItem(username, password);
+            alert('注册成功！');
+            showLoginForm();
+        }
+
+        function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const storedPassword = localStorage.getItem(username);
+            if (storedPassword === password) {
+                const userInfo = document.getElementById('userInfo');
+                userInfo.innerHTML = `<span style="font-weight: bold; color: purple;">欢迎, ${username}</span>`;
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                document.body.style.height = 'auto';
+                document.body.style.overflow = 'auto';
+            } else {
+                alert('用户名或密码错误！');
+            }
+        }
+
+        function animateImage() {
+            const image1 = document.getElementById('image1');
+            image1.classList.add('rotating');
+            setTimeout(() => {
+                image1.src = '武家坡.jpg'; // 替换为新的图片路径
+                image1.classList.remove('rotating');
+            }, 1000);
         }
     </script>
 </body>
