@@ -171,6 +171,10 @@
             <button onclick="postMessage()">发表</button>
             <div class="messages" id="messages"></div>
         </div>
+        <div class="user-list">
+            <h2>用户列表</h2>
+            <ul id="userList"></ul>
+        </div>
     </div>
     <div class="login-form" id="loginForm">
         <h2>登录</h2>
@@ -205,9 +209,20 @@
         function register() {
             const username = document.getElementById('registerUsername').value;
             const password = document.getElementById('registerPassword').value;
-            localStorage.setItem(username, password);
-            alert('注册成功！');
-            showLoginForm();
+            fetch('http://localhost:3000/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            }).then(response => {
+                if (response.status === 201) {
+                    alert('注册成功！');
+                    showLoginForm();
+                } else {
+                    alert('用户名已存在');
+                }
+            });
         }
 
         function login() {
@@ -224,6 +239,7 @@
                 document.body.style.height = 'auto';
                 document.body.style.overflow = 'auto';
                 loadMessages();
+                loadUsers();
             } else {
                 alert('用户名或密码错误！');
             }
@@ -240,6 +256,7 @@
                 document.body.style.height = 'auto';
                 document.body.style.overflow = 'auto';
                 loadMessages();
+                loadUsers();
             }
         }
 
@@ -257,38 +274,29 @@
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
             if (message) {
-                const timestamp = Date.now();
-                const messageData = { user: currentUser, message, timestamp };
-                localStorage.setItem(`message_${timestamp}`, JSON.stringify(messageData));
-                displayMessage(messageData);
-                messageInput.value = '';
-                setTimeout(() => {
-                    localStorage.removeItem(`message_${timestamp}`);
-                    removeMessage(timestamp);
-                }, discussionTimeout);
+                fetch('http://localhost:3000/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user: currentUser, message })
+                }).then(() => {
+                    messageInput.value = '';
+                    loadMessages();
+                });
             }
         }
 
         function loadMessages() {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.innerHTML = '';
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('message_')) {
-                    const messageData = JSON.parse(localStorage.getItem(key));
-                    displayMessage(messageData);
-                    const remainingTime = messageData.timestamp + discussionTimeout - Date.now();
-                    if (remainingTime > 0) {
-                        setTimeout(() => {
-                            localStorage.removeItem(key);
-                            removeMessage(messageData.timestamp);
-                        }, remainingTime);
-                    } else {
-                        localStorage.removeItem(key);
-                        removeMessage(messageData.timestamp);
-                    }
-                }
-            }
+            fetch('http://localhost:3000/messages')
+                .then(response => response.json())
+                .then(data => {
+                    const messagesDiv = document.getElementById('messages');
+                    messagesDiv.innerHTML = '';
+                    data.forEach(messageData => {
+                        displayMessage(messageData);
+                    });
+                });
         }
 
         function displayMessage(messageData) {
@@ -296,16 +304,21 @@
             const newMessage = document.createElement('div');
             newMessage.classList.add('message');
             newMessage.innerHTML = `<strong>${messageData.user}:</strong> ${messageData.message}`;
-            newMessage.dataset.timestamp = messageData.timestamp;
             messagesDiv.appendChild(newMessage);
         }
 
-        function removeMessage(timestamp) {
-            const messagesDiv = document.getElementById('messages');
-            const messageElement = messagesDiv.querySelector(`[data-timestamp="${timestamp}"]`);
-            if (messageElement) {
-                messagesDiv.removeChild(messageElement);
-            }
+        function loadUsers() {
+            fetch('http://localhost:3000/users')
+                .then(response => response.json())
+                .then(data => {
+                    const userList = document.getElementById('userList');
+                    userList.innerHTML = '';
+                    data.forEach(username => {
+                        const li = document.createElement('li');
+                        li.textContent = username;
+                        userList.appendChild(li);
+                    });
+                });
         }
 
         function backToLogin() {
