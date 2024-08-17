@@ -14,7 +14,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 200vh;
+            height: 100vh;
+            overflow: hidden;
         }
         .container {
             background-color: #fff;
@@ -25,31 +26,19 @@
             width: 90%;
             max-width: 800px;
             position: relative;
-        }
-        h1 {
-            color: rgba(0, 128, 0, 0.5);
-            margin-bottom: 20px;
-        }
-        a {
-            text-decoration: none;
-            color: #007BFF;
-            display: block;
-            margin: 5px 0;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin-top: 20px;
+            display: none;
         }
         .login-form {
-            margin-top: 20px;
+            margin: auto;
             padding: 20px;
             border: 1px solid #ccc;
             border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
         .login-form input {
             width: 100%;
@@ -76,6 +65,25 @@
             right: 10px;
             color: #333;
         }
+        h1 {
+            color: rgba(0, 128, 0, 0.5);
+            margin-bottom: 20px;
+        }
+        a {
+            text-decoration: none;
+            color: #007BFF;
+            display: block;
+            margin: 5px 0;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -87,7 +95,7 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="container" id="mainContent">
         <div class="user-info" id="userInfo"></div>
         <h1>我不爱学习</h1>
         <a href="https://www.luogu.com.cn/">洛谷启动</a>
@@ -100,13 +108,12 @@
         <img src="余幼时即厌学.jpg" alt="余幼时即厌学">
         <h1>邢而上学</h1>
         <h1>不邢而退学</h1>
-        
-        <div class="login-form">
-            <h2>登录</h2>
-            <input type="text" id="username" placeholder="用户名">
-            <input type="password" id="password" placeholder="密码">
-            <button onclick="login()">登录</button>
-        </div>
+    </div>
+    <div class="login-form" id="loginForm">
+        <h2>登录</h2>
+        <input type="text" id="username" placeholder="用户名">
+        <input type="password" id="password" placeholder="密码">
+        <button onclick="login()">登录</button>
     </div>
     <script>
         function login() {
@@ -114,7 +121,10 @@
             const password = document.getElementById('password').value;
             const userInfo = document.getElementById('userInfo');
             userInfo.innerHTML = `<span style="font-weight: bold; color: purple;">欢迎, ${username}</span>`;
-            document.querySelector('.login-form').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+            document.body.style.height = 'auto';
+            document.body.style.overflow = 'auto';
         }
     </script>
 </body>
