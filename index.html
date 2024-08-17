@@ -28,6 +28,31 @@
             position: relative;
             display: none;
         }
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .nav-box {
+            width: 30%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .nav-box:hover {
+            background-color: #0056b3;
+        }
+        .content-area {
+            display: none;
+        }
+        .content-area.active {
+            display: block;
+        }
         .login-form, .register-form {
             margin: auto;
             padding: 20px;
@@ -153,27 +178,38 @@
 </head>
 <body>
     <div class="container" id="mainContent">
+        <div class="top-nav">
+            <a href="#" class="nav-box" onclick="showHome()">主页</a>
+            <a href="#" class="nav-box" onclick="showIntro()">介绍</a>
+            <a href="#" class="nav-box" onclick="showDiscussion()">讨论</a>
+        </div>
         <div class="user-info" id="userInfo"></div>
         <a href="#" class="back-to-login" onclick="backToLogin()">返回登录</a>
-        <h1>我不爱学习</h1>
-        <a href="https://www.tboj.cn/">ZYZOJ</a>
-        <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript">JavaScript</a>
-        <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS">CSS</a>
-        <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML">HTML</a>
-        <a href="https://chat.deepseek.com/">Deepseek</a>
-        <h1>余幼时即厌学</h1>
-        <img src="余幼时即厌学.jpg" alt="余幼时即厌学" id="image1" onclick="animateImage()">
-        <h1>邢而上学</h1>
-        <h1>不邢而退学</h1>
-        <div class="discussion-area">
-            <h2>讨论区</h2>
-            <textarea id="messageInput" placeholder="发表你的言论..."></textarea>
-            <button onclick="postMessage()">发表</button>
-            <div class="messages" id="messages"></div>
+        <div class="content-area active" id="homeContent">
+            <h1>我不爱学习</h1>
+            <a href="https://www.luogu.com.cn/">洛谷启动</a>
+            <a href="https://www.tboj.cn/">ZYZOJ</a>
+            <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript">JavaScript</a>
+            <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS">CSS</a>
+            <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML">HTML</a>
+            <a href="https://chat.deepseek.com/">Deepseek</a>
+            <h1>余幼时即厌学</h1>
+            <img src="余幼时即厌学.jpg" alt="余幼时即厌学" id="image1" onclick="animateImage()">
+            <h1>邢而上学</h1>
+            <h1>不邢而退学</h1>
         </div>
-        <div class="user-list">
-            <h2>用户列表</h2>
-            <ul id="userList"></ul>
+        <div class="content-area" id="introContent">
+            <h2>介绍</h2>
+            <p>本网站制作者为 hym ，常年混迹于洛谷，ZYZOJ。有一定的编程基础，但不多。</p>
+            <p>友情链接：<a href="https://dizi-211.github.io">xhd 的网站</a></p>
+        </div>
+        <div class="content-area" id="discussionContent">
+            <div class="discussion-area">
+                <h2>讨论区</h2>
+                <textarea id="messageInput" placeholder="发表你的言论..."></textarea>
+                <button onclick="postMessage()">发表</button>
+                <div class="messages" id="messages"></div>
+            </div>
         </div>
     </div>
     <div class="login-form" id="loginForm">
@@ -209,20 +245,9 @@
         function register() {
             const username = document.getElementById('registerUsername').value;
             const password = document.getElementById('registerPassword').value;
-            fetch('http://localhost:3000/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            }).then(response => {
-                if (response.status === 201) {
-                    alert('注册成功！');
-                    showLoginForm();
-                } else {
-                    alert('用户名已存在');
-                }
-            });
+            localStorage.setItem(username, password);
+            alert('注册成功！');
+            showLoginForm();
         }
 
         function login() {
@@ -239,7 +264,6 @@
                 document.body.style.height = 'auto';
                 document.body.style.overflow = 'auto';
                 loadMessages();
-                loadUsers();
             } else {
                 alert('用户名或密码错误！');
             }
@@ -256,7 +280,6 @@
                 document.body.style.height = 'auto';
                 document.body.style.overflow = 'auto';
                 loadMessages();
-                loadUsers();
             }
         }
 
@@ -274,29 +297,38 @@
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
             if (message) {
-                fetch('http://localhost:3000/messages', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ user: currentUser, message })
-                }).then(() => {
-                    messageInput.value = '';
-                    loadMessages();
-                });
+                const timestamp = Date.now();
+                const messageData = { user: currentUser, message, timestamp };
+                localStorage.setItem(`message_${timestamp}`, JSON.stringify(messageData));
+                displayMessage(messageData);
+                messageInput.value = '';
+                setTimeout(() => {
+                    localStorage.removeItem(`message_${timestamp}`);
+                    removeMessage(timestamp);
+                }, discussionTimeout);
             }
         }
 
         function loadMessages() {
-            fetch('http://localhost:3000/messages')
-                .then(response => response.json())
-                .then(data => {
-                    const messagesDiv = document.getElementById('messages');
-                    messagesDiv.innerHTML = '';
-                    data.forEach(messageData => {
-                        displayMessage(messageData);
-                    });
-                });
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = '';
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('message_')) {
+                    const messageData = JSON.parse(localStorage.getItem(key));
+                    displayMessage(messageData);
+                    const remainingTime = messageData.timestamp + discussionTimeout - Date.now();
+                    if (remainingTime > 0) {
+                        setTimeout(() => {
+                            localStorage.removeItem(key);
+                            removeMessage(messageData.timestamp);
+                        }, remainingTime);
+                    } else {
+                        localStorage.removeItem(key);
+                        removeMessage(messageData.timestamp);
+                    }
+                }
+            }
         }
 
         function displayMessage(messageData) {
@@ -304,21 +336,16 @@
             const newMessage = document.createElement('div');
             newMessage.classList.add('message');
             newMessage.innerHTML = `<strong>${messageData.user}:</strong> ${messageData.message}`;
+            newMessage.dataset.timestamp = messageData.timestamp;
             messagesDiv.appendChild(newMessage);
         }
 
-        function loadUsers() {
-            fetch('http://localhost:3000/users')
-                .then(response => response.json())
-                .then(data => {
-                    const userList = document.getElementById('userList');
-                    userList.innerHTML = '';
-                    data.forEach(username => {
-                        const li = document.createElement('li');
-                        li.textContent = username;
-                        userList.appendChild(li);
-                    });
-                });
+        function removeMessage(timestamp) {
+            const messagesDiv = document.getElementById('messages');
+            const messageElement = messagesDiv.querySelector(`[data-timestamp="${timestamp}"]`);
+            if (messageElement) {
+                messagesDiv.removeChild(messageElement);
+            }
         }
 
         function backToLogin() {
@@ -328,6 +355,24 @@
             const loginPassword = document.getElementById('loginPassword');
             loginUsername.value = localStorage.getItem('loginUsername') || '';
             loginPassword.value = localStorage.getItem('loginPassword') || '';
+        }
+
+        function showHome() {
+            document.getElementById('homeContent').classList.add('active');
+            document.getElementById('introContent').classList.remove('active');
+            document.getElementById('discussionContent').classList.remove('active');
+        }
+
+        function showIntro() {
+            document.getElementById('homeContent').classList.remove('active');
+            document.getElementById('introContent').classList.add('active');
+            document.getElementById('discussionContent').classList.remove('active');
+        }
+
+        function showDiscussion() {
+            document.getElementById('homeContent').classList.remove('active');
+            document.getElementById('introContent').classList.remove('active');
+            document.getElementById('discussionContent').classList.add('active');
         }
 
         // Check login status on page load
