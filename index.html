@@ -14,7 +14,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 250vh;
             overflow: hidden;
         }
         .container {
@@ -96,6 +96,40 @@
                 transform: rotate(360deg);
             }
         }
+        .discussion-area {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .discussion-area textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .discussion-area button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .discussion-area button:hover {
+            background-color: #0056b3;
+        }
+        .discussion-area .messages {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .discussion-area .message {
+            margin-bottom: 10px;
+        }
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -120,6 +154,12 @@
         <img src="余幼时即厌学.jpg" alt="余幼时即厌学" id="image1" onclick="animateImage()">
         <h1>邢而上学</h1>
         <h1>不邢而退学</h1>
+        <div class="discussion-area">
+            <h2>讨论区</h2>
+            <textarea id="messageInput" placeholder="发表你的言论..."></textarea>
+            <button onclick="postMessage()">发表</button>
+            <div class="messages" id="messages"></div>
+        </div>
     </div>
     <div class="login-form" id="loginForm">
         <h2>登录</h2>
@@ -136,6 +176,8 @@
         <button onclick="showLoginForm()">返回登录</button>
     </div>
     <script>
+        let currentUser = null;
+
         function showRegisterForm() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').style.display = 'block';
@@ -159,6 +201,7 @@
             const password = document.getElementById('loginPassword').value;
             const storedPassword = localStorage.getItem(username);
             if (storedPassword === password) {
+                currentUser = username;
                 const userInfo = document.getElementById('userInfo');
                 userInfo.innerHTML = `<span style="font-weight: bold; color: purple;">欢迎, ${username}</span>`;
                 document.getElementById('loginForm').style.display = 'none';
@@ -177,6 +220,19 @@
                 image1.src = '武家坡.jpg'; // 替换为新的图片路径
                 image1.classList.remove('rotating');
             }, 1000);
+        }
+
+        function postMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            if (message) {
+                const messagesDiv = document.getElementById('messages');
+                const newMessage = document.createElement('div');
+                newMessage.classList.add('message');
+                newMessage.innerHTML = `<strong>${currentUser}:</strong> ${message}`;
+                messagesDiv.appendChild(newMessage);
+                messageInput.value = '';
+            }
         }
     </script>
 </body>
