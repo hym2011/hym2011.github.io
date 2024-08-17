@@ -35,7 +35,7 @@
             margin-bottom: 20px;
         }
         .nav-box {
-            width: 30%;
+            width: 23%;
             padding: 10px;
             background-color: #007BFF;
             color: white;
@@ -181,12 +181,14 @@
         <div class="top-nav">
             <a href="#" class="nav-box" onclick="showHome()">主页</a>
             <a href="#" class="nav-box" onclick="showIntro()">介绍</a>
+            <a href="#" class="nav-box" onclick="showProblems()">题库</a>
             <a href="#" class="nav-box" onclick="showDiscussion()">讨论</a>
         </div>
         <div class="user-info" id="userInfo"></div>
         <a href="#" class="back-to-login" onclick="backToLogin()">返回登录</a>
         <div class="content-area active" id="homeContent">
             <h1>我不爱学习</h1>
+            <a href="https://www.luogu.com.cn/">洛谷启动</a>
             <a href="https://www.tboj.cn/">ZYZOJ</a>
             <a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript">JavaScript</a>
             <a href="https://developer.mozilla.org/zh-CN/docs/Web/CSS">CSS</a>
@@ -201,6 +203,17 @@
             <h2>介绍</h2>
             <p>本网站制作者为 hym ，常年混迹于洛谷，ZYZOJ。有一定的编程基础，但不多。</p>
             <p>友情链接：<a href="https://dizi-211.github.io">xhd 的网站</a></p>
+        </div>
+        <div class="content-area" id="problemsContent">
+            <h2>题库</h2>
+            <div class="problem">
+                <h3>Hello world!</h3>
+                <p>输出 "Hello world!"。</p>
+            </div>
+            <div class="problem">
+                <h3>A+B problem</h3>
+                <p>输入两个整数 A 和 B，输出它们的和。</p>
+            </div>
         </div>
         <div class="content-area" id="discussionContent">
             <div class="discussion-area">
@@ -359,18 +372,28 @@
         function showHome() {
             document.getElementById('homeContent').classList.add('active');
             document.getElementById('introContent').classList.remove('active');
+            document.getElementById('problemsContent').classList.remove('active');
             document.getElementById('discussionContent').classList.remove('active');
         }
 
         function showIntro() {
             document.getElementById('homeContent').classList.remove('active');
             document.getElementById('introContent').classList.add('active');
+            document.getElementById('problemsContent').classList.remove('active');
+            document.getElementById('discussionContent').classList.remove('active');
+        }
+
+        function showProblems() {
+            document.getElementById('homeContent').classList.remove('active');
+            document.getElementById('introContent').classList.remove('active');
+            document.getElementById('problemsContent').classList.add('active');
             document.getElementById('discussionContent').classList.remove('active');
         }
 
         function showDiscussion() {
             document.getElementById('homeContent').classList.remove('active');
             document.getElementById('introContent').classList.remove('active');
+            document.getElementById('problemsContent').classList.remove('active');
             document.getElementById('discussionContent').classList.add('active');
         }
 
