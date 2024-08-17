@@ -130,6 +130,17 @@
         .discussion-area .message {
             margin-bottom: 10px;
         }
+        .back-to-login {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #007BFF;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .back-to-login:hover {
+            text-decoration: underline;
+        }
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -143,6 +154,7 @@
 <body>
     <div class="container" id="mainContent">
         <div class="user-info" id="userInfo"></div>
+        <a href="#" class="back-to-login" onclick="backToLogin()">返回登录</a>
         <h1>我不爱学习</h1>
         <a href="https://www.luogu.com.cn/">洛谷启动</a>
         <a href="https://www.tboj.cn/">ZYZOJ</a>
@@ -177,6 +189,9 @@
     </div>
     <script>
         let currentUser = null;
+        const discussionTimeout = 60000; // 1 minute (60000 milliseconds)
+        let imageIndex = 0;
+        const imageSources = ['余幼时即厌学.jpg', '武家坡.jpg', '驾校招牌.jpg'];
 
         function showRegisterForm() {
             document.getElementById('loginForm').style.display = 'none';
@@ -202,14 +217,30 @@
             const storedPassword = localStorage.getItem(username);
             if (storedPassword === password) {
                 currentUser = username;
+                localStorage.setItem('currentUser', username);
                 const userInfo = document.getElementById('userInfo');
                 userInfo.innerHTML = `<span style="font-weight: bold; color: purple;">欢迎, ${username}</span>`;
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
                 document.body.style.height = 'auto';
                 document.body.style.overflow = 'auto';
+                loadMessages();
             } else {
                 alert('用户名或密码错误！');
+            }
+        }
+
+        function checkLoginStatus() {
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                currentUser = storedUser;
+                const userInfo = document.getElementById('userInfo');
+                userInfo.innerHTML = `<span style="font-weight: bold; color: purple;">欢迎, ${currentUser}</span>`;
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                document.body.style.height = 'auto';
+                document.body.style.overflow = 'auto';
+                loadMessages();
             }
         }
 
@@ -217,7 +248,8 @@
             const image1 = document.getElementById('image1');
             image1.classList.add('rotating');
             setTimeout(() => {
-                image1.src = '武家坡.jpg'; // 替换为新的图片路径
+                imageIndex = (imageIndex + 1) % imageSources.length;
+                image1.src = imageSources[imageIndex];
                 image1.classList.remove('rotating');
             }, 1000);
         }
@@ -226,14 +258,68 @@
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
             if (message) {
-                const messagesDiv = document.getElementById('messages');
-                const newMessage = document.createElement('div');
-                newMessage.classList.add('message');
-                newMessage.innerHTML = `<strong>${currentUser}:</strong> ${message}`;
-                messagesDiv.appendChild(newMessage);
+                const timestamp = Date.now();
+                const messageData = { user: currentUser, message, timestamp };
+                localStorage.setItem(`message_${timestamp}`, JSON.stringify(messageData));
+                displayMessage(messageData);
                 messageInput.value = '';
+                setTimeout(() => {
+                    localStorage.removeItem(`message_${timestamp}`);
+                    removeMessage(timestamp);
+                }, discussionTimeout);
             }
         }
+
+        function loadMessages() {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = '';
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('message_')) {
+                    const messageData = JSON.parse(localStorage.getItem(key));
+                    displayMessage(messageData);
+                    const remainingTime = messageData.timestamp + discussionTimeout - Date.now();
+                    if (remainingTime > 0) {
+                        setTimeout(() => {
+                            localStorage.removeItem(key);
+                            removeMessage(messageData.timestamp);
+                        }, remainingTime);
+                    } else {
+                        localStorage.removeItem(key);
+                        removeMessage(messageData.timestamp);
+                    }
+                }
+            }
+        }
+
+        function displayMessage(messageData) {
+            const messagesDiv = document.getElementById('messages');
+            const newMessage = document.createElement('div');
+            newMessage.classList.add('message');
+            newMessage.innerHTML = `<strong>${messageData.user}:</strong> ${messageData.message}`;
+            newMessage.dataset.timestamp = messageData.timestamp;
+            messagesDiv.appendChild(newMessage);
+        }
+
+        function removeMessage(timestamp) {
+            const messagesDiv = document.getElementById('messages');
+            const messageElement = messagesDiv.querySelector(`[data-timestamp="${timestamp}"]`);
+            if (messageElement) {
+                messagesDiv.removeChild(messageElement);
+            }
+        }
+
+        function backToLogin() {
+            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            const loginUsername = document.getElementById('loginUsername');
+            const loginPassword = document.getElementById('loginPassword');
+            loginUsername.value = localStorage.getItem('loginUsername') || '';
+            loginPassword.value = localStorage.getItem('loginPassword') || '';
+        }
+
+        // Check login status on page load
+        checkLoginStatus();
     </script>
 </body>
 </html>
