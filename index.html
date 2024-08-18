@@ -268,6 +268,7 @@
                 <a href="#" onclick="showGuessNumberGame()">猜数字游戏</a>
                 <a href="#" onclick="showRockPaperScissorsGame()">猜拳游戏</a>
                 <a href="#" onclick="showCatchGame()">接东西游戏</a>
+                <a href="#" onclick="showClickCounterGame()">点击计数器游戏</a>
             </div>
         </div>
         <div class="content-area" id="guessNumberGameContent">
@@ -291,6 +292,12 @@
                 <!-- 小球和方块将动态添加到这里 -->
             </div>
             <div class="message" id="catchGameMessage"></div>
+        </div>
+        <div class="content-area" id="clickCounterGameContent">
+            <h2>点击计数器游戏</h2>
+            <p>点击按钮来增加计数：</p>
+            <button onclick="incrementCounter()">点击我！</button>
+            <div class="message" id="clickCounterMessage">0</div>
         </div>
         <div class="content-area" id="profileContent">
             <h2>个人中心</h2>
@@ -335,10 +342,27 @@
         <button onclick="showLoginForm()">返回登录</button>
     </div>
     <script>
+        let clickCount = 0;
         let currentUser = null;
         const discussionTimeout = 60000; // 1 minute (60000 milliseconds)
         let imageIndex = 0;
         const imageSources = ['余幼时即厌学.jpg', '武家坡.jpg', '驾校招牌.jpg','课时内容.jpg','4b1133fb817d4923d4d67af6030fd37a1836999506.jpg','85.jpg','3471c084e68893150bf9b4c50cfe7bae471787350.jpg','a364c9e616ed4fc2df661c88af1e4b6a2042258189.jpg','cdbcb90b9cbe82e0783d8004ca522a18437338685.jpg','e05f20c7d61f1af38ec943c9df8a6f691876898449.jpg','eb00c67a2af68ef718258af767bbd0381970212724.jpg','f87ac166036d00adc43a6c07445d9c4e37816898.jpg','feff256cd057a09859c2bc6bae35600f3461570594080945.jpg'];
+        function showClickCounterGame() {
+            document.getElementById('homeContent').classList.remove('active');
+            document.getElementById('introContent').classList.remove('active');
+            document.getElementById('gamesContent').classList.remove('active');
+            document.getElementById('profileContent').classList.remove('active');
+            document.getElementById('discussionContent').classList.remove('active');
+            document.getElementById('userListContent').classList.remove('active');
+            document.getElementById('guessNumberGameContent').classList.remove('active');
+            document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
+            document.getElementById('catchGameContent').classList.remove('active');
+            document.getElementById('clickCounterGameContent').classList.add('active');
+        }
+        function incrementCounter() {
+            clickCount++;
+            document.getElementById('clickCounterMessage').textContent = clickCount;
+        }
 
         function showRegisterForm() {
             document.getElementById('loginForm').style.display = 'none';
@@ -722,8 +746,8 @@
             const paddleRect = paddle.getBoundingClientRect();
             if (
                 ballRect.bottom >= paddleRect.top &&
-                ballRect.left >= paddleRect.left &&
-                ballRect.right <= paddleRect.right
+                ballRect.left + ballRect.width / 2 >= paddleRect.left &&
+                ballRect.right - ballRect.width / 2 <= paddleRect.right
             ) {
                 score++;
                 document.getElementById('catchGameMessage').textContent = `得分: ${score}`;
