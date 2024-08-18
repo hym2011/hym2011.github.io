@@ -166,6 +166,17 @@
         .back-to-login:hover {
             text-decoration: underline;
         }
+        .user-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .user-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .user-list li {
+            margin-bottom: 10px;
+        }
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -184,6 +195,7 @@
             <a href="#" class="nav-box" onclick="showProblems()">题库</a>
             <a href="#" class="nav-box" onclick="showProfile()">个人中心</a>
             <a href="#" class="nav-box" onclick="showDiscussion()">讨论</a>
+            <a href="#" class="nav-box" onclick="showUserList()">用户列表</a>
         </div>
         <div class="user-info" id="userInfo"></div>
         <a href="#" class="back-to-login" onclick="backToLogin()">返回登录</a>
@@ -235,6 +247,12 @@
                 <textarea id="messageInput" placeholder="发表你的言论..."></textarea>
                 <button onclick="postMessage()">发表</button>
                 <div class="messages" id="messages"></div>
+            </div>
+        </div>
+        <div class="content-area" id="userListContent">
+            <div class="user-list">
+                <h2>用户列表</h2>
+                <ul id="userList"></ul>
             </div>
         </div>
     </div>
@@ -338,6 +356,7 @@
             document.getElementById('problemsContent').classList.remove('active');
             document.getElementById('profileContent').classList.remove('active');
             document.getElementById('discussionContent').classList.add('active');
+            document.getElementById('userListContent').classList.remove('active');
         }
 
         function loadMessages() {
@@ -410,6 +429,7 @@
             document.getElementById('problemsContent').classList.remove('active');
             document.getElementById('profileContent').classList.remove('active');
             document.getElementById('discussionContent').classList.remove('active');
+            document.getElementById('userListContent').classList.remove('active');
         }
 
         function showIntro() {
@@ -418,6 +438,7 @@
             document.getElementById('problemsContent').classList.remove('active');
             document.getElementById('profileContent').classList.remove('active');
             document.getElementById('discussionContent').classList.remove('active');
+            document.getElementById('userListContent').classList.remove('active');
         }
 
         function showProblems() {
@@ -426,6 +447,7 @@
             document.getElementById('problemsContent').classList.add('active');
             document.getElementById('profileContent').classList.remove('active');
             document.getElementById('discussionContent').classList.remove('active');
+            document.getElementById('userListContent').classList.remove('active');
         }
 
         function showProfile() {
@@ -434,6 +456,7 @@
             document.getElementById('problemsContent').classList.remove('active');
             document.getElementById('profileContent').classList.add('active');
             document.getElementById('discussionContent').classList.remove('active');
+            document.getElementById('userListContent').classList.remove('active');
         }
 
         function loadProfile() {
@@ -463,6 +486,29 @@
                 }
             } else {
                 alert('请输入用户名！');
+            }
+        }
+
+        async function showUserList() {
+            document.getElementById('homeContent').classList.remove('active');
+            document.getElementById('introContent').classList.remove('active');
+            document.getElementById('problemsContent').classList.remove('active');
+            document.getElementById('profileContent').classList.remove('active');
+            document.getElementById('discussionContent').classList.remove('active');
+            document.getElementById('userListContent').classList.add('active');
+
+            const response = await fetch('http://localhost:3000/users');
+            if (response.ok) {
+                const users = await response.json();
+                const userList = document.getElementById('userList');
+                userList.innerHTML = '';
+                users.forEach(user => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<strong>${user.username}</strong>: ${user.profileIntro}`;
+                    userList.appendChild(li);
+                });
+            } else {
+                alert('无法加载用户列表！');
             }
         }
 
