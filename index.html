@@ -268,14 +268,20 @@
             document.getElementById('loginForm').style.display = 'block';
         }
 
-        function register() {
+        async function register() {
             const username = document.getElementById('registerUsername').value;
-            const password = document.getElementById('registerPassword').value;
-            localStorage.setItem(username, password);
-            alert('注册成功！');
+            const profileIntro = document.getElementById('profileIntro').value;
+            const response = await fetch('http://localhost:3000/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, profileIntro })
+            });
+            const data = await response.json();
+            alert(data.message);
             showLoginForm();
         }
-
         function login() {
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
@@ -438,13 +444,14 @@
             alert('自我介绍已保存！');
         }
 
-        function visitUserProfile() {
+        async function visitUserProfile() {
             const username = document.getElementById('visitUsername').value.trim();
             if (username) {
-                const profileIntro = localStorage.getItem(`profileIntro_${username}`);
-                if (profileIntro !== null) {
-                    document.getElementById('profileName').textContent = username;
-                    document.getElementById('profileIntro').value = profileIntro;
+                const response = await fetch(`http://localhost:3000/user/${username}`);
+                if (response.ok) {
+                    const user = await response.json();
+                    document.getElementById('profileName').textContent = user.username;
+                    document.getElementById('profileIntro').value = user.profileIntro;
                     showProfile();
                 } else {
                     alert('该用户不存在或未设置个人介绍！');
