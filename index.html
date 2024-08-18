@@ -177,6 +177,25 @@
         .user-list li {
             margin-bottom: 10px;
         }
+        .game-nav {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .game-nav a {
+            width: 49%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .game-nav a:hover {
+            background-color: #0056b3;
+        }
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -192,7 +211,7 @@
         <div class="top-nav">
             <a href="#" class="nav-box" onclick="showHome()">主页</a>
             <a href="#" class="nav-box" onclick="showIntro()">介绍</a>
-            <a href="#" class="nav-box" onclick="showProblems()">题库</a>
+            <a href="#" class="nav-box" onclick="showGames()">游戏</a>
             <a href="#" class="nav-box" onclick="showProfile()">个人中心</a>
             <a href="#" class="nav-box" onclick="showDiscussion()">讨论</a>
             <a href="#" class="nav-box" onclick="showUserList()">用户列表</a>
@@ -217,16 +236,27 @@
             <p>本网站制作者为 hym ，常年混迹于洛谷，ZYZOJ。有一定的编程基础，但不多。</p>
             <p>友情链接：<a href="https://dizi-211.github.io">xhd 的网站</a></p>
         </div>
-        <div class="content-area" id="problemsContent">
-            <h2>题库</h2>
-            <div class="problem">
-                <h3>Hello world!</h3>
-                <p>输出 "Hello world!"。</p>
+        <div class="content-area" id="gamesContent">
+            <h2>游戏</h2>
+            <div class="game-nav">
+                <a href="#" onclick="showGuessNumberGame()">猜数字游戏</a>
+                <a href="#" onclick="showRockPaperScissorsGame()">猜拳游戏</a>
             </div>
-            <div class="problem">
-                <h3>A+B problem</h3>
-                <p>输入两个整数 A 和 B，输出它们的和。</p>
-            </div>
+        </div>
+        <div class="content-area" id="guessNumberGameContent">
+            <h2>猜数字游戏</h2>
+            <p>我想了一个1到100之间的数字，你能猜到它吗？</p>
+            <input type="number" id="guessNumberInput" placeholder="输入你的猜测">
+            <button onclick="checkGuessNumber()">提交</button>
+            <div class="message" id="guessNumberMessage"></div>
+        </div>
+        <div class="content-area" id="rockPaperScissorsGameContent">
+            <h2>猜拳游戏</h2>
+            <p>选择你的选项：</p>
+            <button onclick="playRockPaperScissors('rock')">石头</button>
+            <button onclick="playRockPaperScissors('paper')">布</button>
+            <button onclick="playRockPaperScissors('scissors')">剪刀</button>
+            <div class="message" id="rockPaperScissorsMessage"></div>
         </div>
         <div class="content-area" id="profileContent">
             <h2>个人中心</h2>
@@ -353,10 +383,12 @@
         function showDiscussion() {
             document.getElementById('homeContent').classList.remove('active');
             document.getElementById('introContent').classList.remove('active');
-            document.getElementById('problemsContent').classList.remove('active');
+            document.getElementById('gamesContent').classList.remove('active');
             document.getElementById('profileContent').classList.remove('active');
             document.getElementById('discussionContent').classList.add('active');
             document.getElementById('userListContent').classList.remove('active');
+            document.getElementById('guessNumberGameContent').classList.remove('active');
+            document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
         }
 
         function loadMessages() {
@@ -426,37 +458,45 @@
         function showHome() {
             document.getElementById('homeContent').classList.add('active');
             document.getElementById('introContent').classList.remove('active');
-            document.getElementById('problemsContent').classList.remove('active');
+            document.getElementById('gamesContent').classList.remove('active');
             document.getElementById('profileContent').classList.remove('active');
             document.getElementById('discussionContent').classList.remove('active');
             document.getElementById('userListContent').classList.remove('active');
+            document.getElementById('guessNumberGameContent').classList.remove('active');
+            document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
         }
 
         function showIntro() {
             document.getElementById('homeContent').classList.remove('active');
             document.getElementById('introContent').classList.add('active');
-            document.getElementById('problemsContent').classList.remove('active');
+            document.getElementById('gamesContent').classList.remove('active');
             document.getElementById('profileContent').classList.remove('active');
             document.getElementById('discussionContent').classList.remove('active');
             document.getElementById('userListContent').classList.remove('active');
+            document.getElementById('guessNumberGameContent').classList.remove('active');
+            document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
         }
 
-        function showProblems() {
+        function showGames() {
             document.getElementById('homeContent').classList.remove('active');
             document.getElementById('introContent').classList.remove('active');
-            document.getElementById('problemsContent').classList.add('active');
+            document.getElementById('gamesContent').classList.add('active');
             document.getElementById('profileContent').classList.remove('active');
             document.getElementById('discussionContent').classList.remove('active');
             document.getElementById('userListContent').classList.remove('active');
+            document.getElementById('guessNumberGameContent').classList.remove('active');
+            document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
         }
 
         function showProfile() {
             document.getElementById('homeContent').classList.remove('active');
             document.getElementById('introContent').classList.remove('active');
-            document.getElementById('problemsContent').classList.remove('active');
+            document.getElementById('gamesContent').classList.remove('active');
             document.getElementById('profileContent').classList.add('active');
             document.getElementById('discussionContent').classList.remove('active');
             document.getElementById('userListContent').classList.remove('active');
+            document.getElementById('guessNumberGameContent').classList.remove('active');
+            document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
         }
 
         function loadProfile() {
@@ -492,10 +532,12 @@
         async function showUserList() {
             document.getElementById('homeContent').classList.remove('active');
             document.getElementById('introContent').classList.remove('active');
-            document.getElementById('problemsContent').classList.remove('active');
+            document.getElementById('gamesContent').classList.remove('active');
             document.getElementById('profileContent').classList.remove('active');
             document.getElementById('discussionContent').classList.remove('active');
             document.getElementById('userListContent').classList.add('active');
+            document.getElementById('guessNumberGameContent').classList.remove('active');
+            document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
 
             try {
                 const response = await fetch('http://localhost:3000/users');
@@ -512,6 +554,67 @@
                 });
             } catch (error) {
                 alert(error.message);
+            }
+        }
+
+        function showGuessNumberGame() {
+            document.getElementById('homeContent').classList.remove('active');
+            document.getElementById('introContent').classList.remove('active');
+            document.getElementById('gamesContent').classList.remove('active');
+            document.getElementById('profileContent').classList.remove('active');
+            document.getElementById('discussionContent').classList.remove('active');
+            document.getElementById('userListContent').classList.remove('active');
+            document.getElementById('guessNumberGameContent').classList.add('active');
+            document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
+        }
+
+        function showRockPaperScissorsGame() {
+            document.getElementById('homeContent').classList.remove('active');
+            document.getElementById('introContent').classList.remove('active');
+            document.getElementById('gamesContent').classList.remove('active');
+            document.getElementById('profileContent').classList.remove('active');
+            document.getElementById('discussionContent').classList.remove('active');
+            document.getElementById('userListContent').classList.remove('active');
+            document.getElementById('guessNumberGameContent').classList.remove('active');
+            document.getElementById('rockPaperScissorsGameContent').classList.add('active');
+        }
+
+        const randomNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+
+        function checkGuessNumber() {
+            const userGuess = parseInt(document.getElementById('guessNumberInput').value);
+            attempts++;
+
+            const messageElement = document.getElementById('guessNumberMessage');
+
+            if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
+                messageElement.textContent = '请输入一个1到100之间的有效数字。';
+            } else if (userGuess === randomNumber) {
+                messageElement.textContent = `恭喜你！你在${attempts}次尝试中猜对了数字${randomNumber}。`;
+            } else if (userGuess < randomNumber) {
+                messageElement.textContent = '太低了，再试一次。';
+            } else {
+                messageElement.textContent = '太高了，再试一次。';
+            }
+        }
+
+        function playRockPaperScissors(userChoice) {
+            const choices = ['石头', '布', '剪刀'];
+            const computerChoice = choices[Math.floor(Math.random() * 3)];
+
+            const messageElement = document.getElementById('rockPaperScissorsMessage');
+
+            if (userChoice === computerChoice) {
+                messageElement.textContent = `平局！你和电脑都选择了${userChoice}。`;
+            } else if (
+                (userChoice === 'rock' && computerChoice === 'scissors') ||
+                (userChoice === 'paper' && computerChoice === 'rock') ||
+                (userChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                messageElement.textContent = `你赢了！你选择了${userChoice}，电脑选择了${computerChoice}。`;
+            } else {
+                messageElement.textContent = `你输了！你选择了${userChoice}，电脑选择了${computerChoice}。`;
             }
         }
 
