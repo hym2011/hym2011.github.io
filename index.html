@@ -223,6 +223,11 @@
                 <textarea id="profileIntro" placeholder="请输入您的自我介绍..."></textarea>
                 <button onclick="saveProfile()">保存</button>
             </div>
+            <div id="visitOthers">
+                <h3>访问他人</h3>
+                <input type="text" id="visitUsername" placeholder="输入用户名">
+                <button onclick="visitUserProfile()">访问</button>
+            </div>
         </div>
         <div class="content-area" id="discussionContent">
             <div class="discussion-area">
@@ -378,69 +383,6 @@
                 }, discussionTimeout);
             }
         }
-        function showDiscussion() {
-            document.getElementById('homeContent').classList.remove('active');
-            document.getElementById('introContent').classList.remove('active');
-            document.getElementById('problemsContent').classList.remove('active');
-            document.getElementById('profileContent').classList.remove('active');
-            document.getElementById('discussionContent').classList.add('active');
-        }
-
-        function loadMessages() {
-            const messagesDiv = document.getElementById('messages');
-            messagesDiv.innerHTML = '';
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key.startsWith('message_')) {
-                    const messageData = JSON.parse(localStorage.getItem(key));
-                    displayMessage(messageData);
-                    const remainingTime = messageData.timestamp + discussionTimeout - Date.now();
-                    if (remainingTime > 0) {
-                        setTimeout(() => {
-                            localStorage.removeItem(key);
-                            removeMessage(messageData.timestamp);
-                        }, remainingTime);
-                    } else {
-                        localStorage.removeItem(key);
-                        removeMessage(messageData.timestamp);
-                    }
-                }
-            }
-        }
-
-        function displayMessage(messageData) {
-            const messagesDiv = document.getElementById('messages');
-            const newMessage = document.createElement('div');
-            newMessage.classList.add('message');
-            newMessage.innerHTML = `<strong>${messageData.user}:</strong> ${messageData.message}`;
-            newMessage.dataset.timestamp = messageData.timestamp;
-            messagesDiv.appendChild(newMessage);
-        }
-
-        function removeMessage(timestamp) {
-            const messagesDiv = document.getElementById('messages');
-            const messageElement = messagesDiv.querySelector(`[data-timestamp="${timestamp}"]`);
-            if (messageElement) {
-                messagesDiv.removeChild(messageElement);
-            }
-        }
-
-        function postMessage() {
-            const messageInput = document.getElementById('messageInput');
-            const message = messageInput.value.trim();
-            if (message) {
-                const timestamp = Date.now();
-                const messageData = { user: currentUser, message, timestamp };
-                localStorage.setItem(`message_${timestamp}`, JSON.stringify(messageData));
-                displayMessage(messageData);
-                messageInput.value = '';
-                setTimeout(() => {
-                    localStorage.removeItem(`message_${timestamp}`);
-                    removeMessage(timestamp);
-                }, discussionTimeout);
-            }
-        }
-
 
         function backToLogin() {
             document.getElementById('mainContent').style.display = 'none';
@@ -494,6 +436,22 @@
             const profileIntro = document.getElementById('profileIntro').value;
             localStorage.setItem(`profileIntro_${currentUser}`, profileIntro);
             alert('自我介绍已保存！');
+        }
+
+        function visitUserProfile() {
+            const username = document.getElementById('visitUsername').value.trim();
+            if (username) {
+                const profileIntro = localStorage.getItem(`profileIntro_${username}`);
+                if (profileIntro !== null) {
+                    document.getElementById('profileName').textContent = username;
+                    document.getElementById('profileIntro').value = profileIntro;
+                    showProfile();
+                } else {
+                    alert('该用户不存在或未设置个人介绍！');
+                }
+            } else {
+                alert('请输入用户名！');
+            }
         }
 
         // Check login status on page load
