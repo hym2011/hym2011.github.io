@@ -196,7 +196,7 @@
         .game-nav a:hover {
             background-color: #0056b3;
         }
-        .fruit-game {
+        .catch-game {
             position: relative;
             width: 100%;
             height: 400px;
@@ -205,10 +205,21 @@
             overflow: hidden;
             background-color: #f9f9f9;
         }
-        .fruit {
+        .ball {
             position: absolute;
-            width: 50px;
-            height: 50px;
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            border-radius: 50%;
+        }
+        .paddle {
+            position: absolute;
+            width: 100px;
+            height: 20px;
+            background-color: blue;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
             cursor: pointer;
         }
         @media (max-width: 600px) {
@@ -256,7 +267,7 @@
             <div class="game-nav">
                 <a href="#" onclick="showGuessNumberGame()">猜数字游戏</a>
                 <a href="#" onclick="showRockPaperScissorsGame()">猜拳游戏</a>
-                <a href="#" onclick="showFruitGame()">接东西游戏</a>
+                <a href="#" onclick="showCatchGame()">接东西游戏</a>
             </div>
         </div>
         <div class="content-area" id="guessNumberGameContent">
@@ -274,12 +285,12 @@
             <button onclick="playRockPaperScissors('scissors')">剪刀</button>
             <div class="message" id="rockPaperScissorsMessage"></div>
         </div>
-        <div class="content-area" id="fruitGameContent">
-            <h2>切水果游戏</h2>
-            <div class="fruit-game" id="fruitGame">
-                <!-- 水果图片将动态添加到这里 -->
+        <div class="content-area" id="catchGameContent">
+            <h2>接东西游戏</h2>
+            <div class="catch-game" id="catchGame">
+                <!-- 小球和方块将动态添加到这里 -->
             </div>
-            <div class="message" id="fruitGameMessage"></div>
+            <div class="message" id="catchGameMessage"></div>
         </div>
         <div class="content-area" id="profileContent">
             <h2>个人中心</h2>
@@ -412,7 +423,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
-            document.getElementById('fruitGameContent').classList.remove('active');
+            document.getElementById('catchGameContent').classList.remove('active');
         }
 
         function loadMessages() {
@@ -488,7 +499,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
-            document.getElementById('fruitGameContent').classList.remove('active');
+            document.getElementById('catchGameContent').classList.remove('active');
         }
 
         function showIntro() {
@@ -500,7 +511,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
-            document.getElementById('fruitGameContent').classList.remove('active');
+            document.getElementById('catchGameContent').classList.remove('active');
         }
 
         function showGames() {
@@ -512,7 +523,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
-            document.getElementById('fruitGameContent').classList.remove('active');
+            document.getElementById('catchGameContent').classList.remove('active');
         }
 
         function showProfile() {
@@ -524,7 +535,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
-            document.getElementById('fruitGameContent').classList.remove('active');
+            document.getElementById('catchGameContent').classList.remove('active');
         }
 
         function loadProfile() {
@@ -566,7 +577,7 @@
             document.getElementById('userListContent').classList.add('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
-            document.getElementById('fruitGameContent').classList.remove('active');
+            document.getElementById('catchGameContent').classList.remove('active');
 
             try {
                 const response = await fetch('http://localhost:3000/users');
@@ -595,7 +606,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.add('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
-            document.getElementById('fruitGameContent').classList.remove('active');
+            document.getElementById('catchGameContent').classList.remove('active');
         }
 
         function showRockPaperScissorsGame() {
@@ -607,10 +618,10 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.add('active');
-            document.getElementById('fruitGameContent').classList.remove('active');
+            document.getElementById('catchGameContent').classList.remove('active');
         }
 
-        function showFruitGame() {
+        function showCatchGame() {
             document.getElementById('homeContent').classList.remove('active');
             document.getElementById('introContent').classList.remove('active');
             document.getElementById('gamesContent').classList.remove('active');
@@ -619,8 +630,8 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
-            document.getElementById('fruitGameContent').classList.add('active');
-            startFruitGame();
+            document.getElementById('catchGameContent').classList.add('active');
+            startCatchGame();
         }
 
         const randomNumber = Math.floor(Math.random() * 100) + 1;
@@ -662,44 +673,69 @@
             }
         }
 
-        const fruits = ['apple.png', 'banana.png', 'cherry.png', 'grape.png', 'orange.png'];
-        let fruitGameInterval;
+        let catchGameInterval;
         let score = 0;
+        let paddle;
+        let catchGame;
 
-        function startFruitGame() {
-            const fruitGame = document.getElementById('fruitGame');
-            fruitGame.innerHTML = '';
+        function startCatchGame() {
+            catchGame = document.getElementById('catchGame');
+            catchGame.innerHTML = '';
             score = 0;
-            document.getElementById('fruitGameMessage').textContent = `得分: ${score}`;
+            document.getElementById('catchGameMessage').textContent = `得分: ${score}`;
 
-            fruitGameInterval = setInterval(() => {
-                const fruit = document.createElement('img');
-                fruit.src = fruits[Math.floor(Math.random() * fruits.length)];
-                fruit.classList.add('fruit');
-                fruit.style.left = `${Math.random() * (fruitGame.clientWidth - 50)}px`;
-                fruit.style.top = `-50px`;
-                fruitGame.appendChild(fruit);
+            paddle = document.createElement('div');
+            paddle.classList.add('paddle');
+            catchGame.appendChild(paddle);
 
-                fruit.addEventListener('click', () => {
-                    fruit.remove();
-                    score++;
-                    document.getElementById('fruitGameMessage').textContent = `得分: ${score}`;
-                });
+            catchGame.addEventListener('mousemove', (event) => {
+                const rect = catchGame.getBoundingClientRect();
+                const x = event.clientX - rect.left - paddle.offsetWidth / 2;
+                if (x >= 0 && x <= catchGame.clientWidth - paddle.offsetWidth) {
+                    paddle.style.left = `${x}px`;
+                }
+            });
 
-                let position = -50;
+            catchGameInterval = setInterval(() => {
+                const ball = document.createElement('div');
+                ball.classList.add('ball');
+                ball.style.left = `${Math.random() * (catchGame.clientWidth - 30)}px`;
+                catchGame.appendChild(ball);
+
+                let position = -30;
                 const animation = setInterval(() => {
                     position += 2;
-                    fruit.style.top = `${position}px`;
-                    if (position > fruitGame.clientHeight) {
+                    ball.style.top = `${position}px`;
+                    if (position > catchGame.clientHeight - 30) {
                         clearInterval(animation);
-                        fruit.remove();
+                        ball.remove();
+                        if (!isBallCaught(ball)) {
+                            endCatchGame();
+                        }
                     }
                 }, 10);
             }, 1000);
         }
 
-        function stopFruitGame() {
-            clearInterval(fruitGameInterval);
+        function isBallCaught(ball) {
+            const ballRect = ball.getBoundingClientRect();
+            const paddleRect = paddle.getBoundingClientRect();
+            if (
+                ballRect.bottom >= paddleRect.top &&
+                ballRect.left >= paddleRect.left &&
+                ballRect.right <= paddleRect.right
+            ) {
+                score++;
+                document.getElementById('catchGameMessage').textContent = `得分: ${score}`;
+                return true;
+            }
+            return false;
+        }
+
+        function endCatchGame() {
+            clearInterval(catchGameInterval);
+            alert(`游戏结束！你的得分是: ${score}`);
+            catchGame.innerHTML = '';
         }
 
         // Check login status on page load
