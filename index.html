@@ -184,7 +184,7 @@
             margin-top: 20px;
         }
         .game-nav a {
-            width: 49%;
+            width: 32%;
             padding: 10px;
             background-color: #007BFF;
             color: white;
@@ -195,6 +195,21 @@
         }
         .game-nav a:hover {
             background-color: #0056b3;
+        }
+        .fruit-game {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: #f9f9f9;
+        }
+        .fruit {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
         }
         @media (max-width: 600px) {
             .container {
@@ -219,7 +234,6 @@
         <div class="user-info" id="userInfo"></div>
         <a href="#" class="back-to-login" onclick="backToLogin()">返回登录</a>
         <div class="content-area active" id="homeContent">
-            <h1>注：本站的讨论及用户列表尚未开发，正在加班加点做</h1>
             <h1>我不爱学习</h1>
             <a href="https://www.luogu.com.cn/">洛谷启动</a>
             <a href="https://www.tboj.cn/">ZYZOJ</a>
@@ -242,6 +256,7 @@
             <div class="game-nav">
                 <a href="#" onclick="showGuessNumberGame()">猜数字游戏</a>
                 <a href="#" onclick="showRockPaperScissorsGame()">猜拳游戏</a>
+                <a href="#" onclick="showFruitGame()">接东西游戏</a>
             </div>
         </div>
         <div class="content-area" id="guessNumberGameContent">
@@ -258,6 +273,13 @@
             <button onclick="playRockPaperScissors('paper')">布</button>
             <button onclick="playRockPaperScissors('scissors')">剪刀</button>
             <div class="message" id="rockPaperScissorsMessage"></div>
+        </div>
+        <div class="content-area" id="fruitGameContent">
+            <h2>切水果游戏</h2>
+            <div class="fruit-game" id="fruitGame">
+                <!-- 水果图片将动态添加到这里 -->
+            </div>
+            <div class="message" id="fruitGameMessage"></div>
         </div>
         <div class="content-area" id="profileContent">
             <h2>个人中心</h2>
@@ -390,6 +412,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
+            document.getElementById('fruitGameContent').classList.remove('active');
         }
 
         function loadMessages() {
@@ -465,6 +488,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
+            document.getElementById('fruitGameContent').classList.remove('active');
         }
 
         function showIntro() {
@@ -476,6 +500,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
+            document.getElementById('fruitGameContent').classList.remove('active');
         }
 
         function showGames() {
@@ -487,6 +512,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
+            document.getElementById('fruitGameContent').classList.remove('active');
         }
 
         function showProfile() {
@@ -498,6 +524,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
+            document.getElementById('fruitGameContent').classList.remove('active');
         }
 
         function loadProfile() {
@@ -539,6 +566,7 @@
             document.getElementById('userListContent').classList.add('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
+            document.getElementById('fruitGameContent').classList.remove('active');
 
             try {
                 const response = await fetch('http://localhost:3000/users');
@@ -567,6 +595,7 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.add('active');
             document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
+            document.getElementById('fruitGameContent').classList.remove('active');
         }
 
         function showRockPaperScissorsGame() {
@@ -578,6 +607,20 @@
             document.getElementById('userListContent').classList.remove('active');
             document.getElementById('guessNumberGameContent').classList.remove('active');
             document.getElementById('rockPaperScissorsGameContent').classList.add('active');
+            document.getElementById('fruitGameContent').classList.remove('active');
+        }
+
+        function showFruitGame() {
+            document.getElementById('homeContent').classList.remove('active');
+            document.getElementById('introContent').classList.remove('active');
+            document.getElementById('gamesContent').classList.remove('active');
+            document.getElementById('profileContent').classList.remove('active');
+            document.getElementById('discussionContent').classList.remove('active');
+            document.getElementById('userListContent').classList.remove('active');
+            document.getElementById('guessNumberGameContent').classList.remove('active');
+            document.getElementById('rockPaperScissorsGameContent').classList.remove('active');
+            document.getElementById('fruitGameContent').classList.add('active');
+            startFruitGame();
         }
 
         const randomNumber = Math.floor(Math.random() * 100) + 1;
@@ -617,6 +660,46 @@
             } else {
                 messageElement.textContent = `你输了！你选择了${userChoice}，电脑选择了${computerChoice}。`;
             }
+        }
+
+        const fruits = ['apple.png', 'banana.png', 'cherry.png', 'grape.png', 'orange.png'];
+        let fruitGameInterval;
+        let score = 0;
+
+        function startFruitGame() {
+            const fruitGame = document.getElementById('fruitGame');
+            fruitGame.innerHTML = '';
+            score = 0;
+            document.getElementById('fruitGameMessage').textContent = `得分: ${score}`;
+
+            fruitGameInterval = setInterval(() => {
+                const fruit = document.createElement('img');
+                fruit.src = fruits[Math.floor(Math.random() * fruits.length)];
+                fruit.classList.add('fruit');
+                fruit.style.left = `${Math.random() * (fruitGame.clientWidth - 50)}px`;
+                fruit.style.top = `-50px`;
+                fruitGame.appendChild(fruit);
+
+                fruit.addEventListener('click', () => {
+                    fruit.remove();
+                    score++;
+                    document.getElementById('fruitGameMessage').textContent = `得分: ${score}`;
+                });
+
+                let position = -50;
+                const animation = setInterval(() => {
+                    position += 2;
+                    fruit.style.top = `${position}px`;
+                    if (position > fruitGame.clientHeight) {
+                        clearInterval(animation);
+                        fruit.remove();
+                    }
+                }, 10);
+            }, 1000);
+        }
+
+        function stopFruitGame() {
+            clearInterval(fruitGameInterval);
         }
 
         // Check login status on page load
