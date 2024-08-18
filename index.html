@@ -270,16 +270,20 @@
 
         async function register() {
             const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
             const profileIntro = document.getElementById('profileIntro').value;
             const response = await fetch('http://localhost:3000/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ username, profileIntro })
+                body: JSON.stringify({ username, password, profileIntro })
             });
             const data = await response.json();
             alert(data.message);
+            if (response.ok) {
+                localStorage.setItem(username, password); // 存储密码
+            }
             showLoginForm();
         }
 
