@@ -601,7 +601,7 @@
         }
 
         function playRockPaperScissors(userChoice) {
-            const choices = ['石头', '布', '剪刀'];
+            const choices = ['rock', 'paper', 'scissors'];
             const computerChoice = choices[Math.floor(Math.random() * 3)];
 
             const messageElement = document.getElementById('rockPaperScissorsMessage');
@@ -609,9 +609,9 @@
             if (userChoice === computerChoice) {
                 messageElement.textContent = `平局！你和电脑都选择了${userChoice}。`;
             } else if (
-                (userChoice === '石头' && computerChoice === '剪刀') ||
-                (userChoice === '布' && computerChoice === '石头') ||
-                (userChoice === '剪刀' && computerChoice === '布')
+                (userChoice === 'rock' && computerChoice === 'scissors') ||
+                (userChoice === 'paper' && computerChoice === 'rock') ||
+                (userChoice === 'scissors' && computerChoice === 'paper')
             ) {
                 messageElement.textContent = `你赢了！你选择了${userChoice}，电脑选择了${computerChoice}。`;
             } else {
